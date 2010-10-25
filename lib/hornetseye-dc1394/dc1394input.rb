@@ -25,9 +25,9 @@ module Hornetseye
 
       alias_method :orig_new, :new
 
-      def new( node = 0 )
+      def new( node = 0, speed = SPEED_400 )
         @@dc1394 = DC1394.new unless @@dc1394
-        orig_new @@dc1394, node
+        orig_new @@dc1394, node, speed
       end
 
     end

@@ -25,7 +25,8 @@ using namespace std;
 
 VALUE DC1394Input::cRubyClass = Qnil;
 
-DC1394Input::DC1394Input( DC1394Ptr dc1394, int node ) throw (Error):
+DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed )
+  throw (Error):
   m_dc1394( dc1394 ), m_node( node ), m_camera( NULL )
 {
   dc1394camera_list_t *list = NULL;
@@ -48,7 +49,7 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node ) throw (Error):
                << node << " (guid 0x" << setbase( 16 ) << list->ids[ node ].guid
                << setbase( 10 ) << ")" );
     // ...
-    err = dc1394_video_set_iso_speed( m_camera, DC1394_ISO_SPEED_400 );
+    err = dc1394_video_set_iso_speed( m_camera, speed );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting iso speed: "
                 << dc1394_error_get_string( err ) );
     err = dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
@@ -96,8 +97,14 @@ bool DC1394Input::status(void) const
 VALUE DC1394Input::registerRubyClass( VALUE module )
 {
   cRubyClass = rb_define_class_under( module, "DC1394Input", rb_cObject );
+  rb_define_const( cRubyClass, "SPEED_100", INT2NUM( DC1394_ISO_SPEED_100 ) );
+  rb_define_const( cRubyClass, "SPEED_200", INT2NUM( DC1394_ISO_SPEED_200 ) );
+  rb_define_const( cRubyClass, "SPEED_400", INT2NUM( DC1394_ISO_SPEED_400 ) );
+  rb_define_const( cRubyClass, "SPEED_800", INT2NUM( DC1394_ISO_SPEED_800 ) );
+  rb_define_const( cRubyClass, "SPEED_1600", INT2NUM( DC1394_ISO_SPEED_1600 ) );
+  rb_define_const( cRubyClass, "SPEED_3200", INT2NUM( DC1394_ISO_SPEED_3200 ) );
   rb_define_singleton_method( cRubyClass, "new",
-                              RUBY_METHOD_FUNC( wrapNew ), 2 );
+                              RUBY_METHOD_FUNC( wrapNew ), 3 );
   rb_define_method( cRubyClass, "close",
                     RUBY_METHOD_FUNC( wrapClose ), 0 );
   rb_define_method( cRubyClass, "read",
@@ -112,12 +119,14 @@ void DC1394Input::deleteRubyObject( void *ptr )
   delete (DC1394InputPtr *)ptr;
 }
 
-VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode )
+VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
+                            VALUE rbSpeed )
 {
   VALUE retVal = Qnil;
   try {
     DC1394Ptr *dc1394; Data_Get_Struct( rbDC1394, DC1394Ptr, dc1394 );
-    DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2INT( rbNode ) ) );
+    DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2INT( rbNode ),
+                                         (dc1394speed_t)NUM2INT( rbSpeed ) ) );
     retVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
                                new DC1394InputPtr( ptr ) );
   } catch ( std::exception &e ) {
