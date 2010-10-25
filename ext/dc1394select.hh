@@ -26,7 +26,7 @@ class DC1394Select
 public:
   DC1394Select(void) throw (Error);
   virtual ~DC1394Select(void);
-  void add( dc1394color_coding_t coding );
+  void add( dc1394color_coding_t coding, unsigned int width, unsigned int height );
   int make(void) throw (Error);
   static VALUE wrapRescue( VALUE rbValue );
 protected:

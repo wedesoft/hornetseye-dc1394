@@ -53,10 +53,14 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
     err = dc1394_video_get_supported_modes( m_camera, &videoModes );
     for ( int i=0; i<videoModes.num; i++ ) {
       if ( !dc1394_is_video_mode_scalable( videoModes.modes[i] ) ) {
+        dc1394video_mode_t videoMode = videoModes.modes[i];
         dc1394color_coding_t coding;
-        dc1394_get_color_coding_from_video_mode( m_camera, videoModes.modes[i],
-                                                 &coding );
-        select->add( coding );
+        dc1394_get_color_coding_from_video_mode( m_camera, videoMode, &coding );
+        unsigned int width, height;
+        dc1394_get_image_size_from_video_mode( m_camera, videoMode, &width, &height );
+        select->add( coding, width, height );
+      } else {
+        ERRORMACRO( false, Error, , "Scalable video modes not implemented yet" );
       };
     };
     int selection = select->make();
@@ -109,12 +113,23 @@ bool DC1394Input::status(void) const
 VALUE DC1394Input::registerRubyClass( VALUE module )
 {
   cRubyClass = rb_define_class_under( module, "DC1394Input", rb_cObject );
-  rb_define_const( cRubyClass, "SPEED_100", INT2NUM( DC1394_ISO_SPEED_100 ) );
-  rb_define_const( cRubyClass, "SPEED_200", INT2NUM( DC1394_ISO_SPEED_200 ) );
-  rb_define_const( cRubyClass, "SPEED_400", INT2NUM( DC1394_ISO_SPEED_400 ) );
-  rb_define_const( cRubyClass, "SPEED_800", INT2NUM( DC1394_ISO_SPEED_800 ) );
-  rb_define_const( cRubyClass, "SPEED_1600", INT2NUM( DC1394_ISO_SPEED_1600 ) );
-  rb_define_const( cRubyClass, "SPEED_3200", INT2NUM( DC1394_ISO_SPEED_3200 ) );
+  rb_define_const( cRubyClass,  "SPEED_100",  INT2NUM(  DC1394_ISO_SPEED_100 ) );
+  rb_define_const( cRubyClass,  "SPEED_200",  INT2NUM(  DC1394_ISO_SPEED_200 ) );
+  rb_define_const( cRubyClass,  "SPEED_400",  INT2NUM(  DC1394_ISO_SPEED_400 ) );
+  rb_define_const( cRubyClass,  "SPEED_800",  INT2NUM(  DC1394_ISO_SPEED_800 ) );
+  rb_define_const( cRubyClass,  "SPEED_1600", INT2NUM( DC1394_ISO_SPEED_1600 ) );
+  rb_define_const( cRubyClass,  "SPEED_3200", INT2NUM( DC1394_ISO_SPEED_3200 ) );
+  rb_define_const( cRubyClass,   "MONO8", INT2NUM(   DC1394_COLOR_CODING_MONO8 ) );
+  rb_define_const( cRubyClass,  "YUV411", INT2NUM(  DC1394_COLOR_CODING_YUV411 ) );
+  rb_define_const( cRubyClass,  "YUV422", INT2NUM(  DC1394_COLOR_CODING_YUV422 ) );
+  rb_define_const( cRubyClass,  "YUV444", INT2NUM(  DC1394_COLOR_CODING_YUV444 ) );
+  rb_define_const( cRubyClass,    "RGB8", INT2NUM(    DC1394_COLOR_CODING_RGB8 ) );
+  rb_define_const( cRubyClass,  "MONO16", INT2NUM(  DC1394_COLOR_CODING_MONO16 ) );
+  rb_define_const( cRubyClass,   "RGB16", INT2NUM(   DC1394_COLOR_CODING_RGB16 ) );
+  rb_define_const( cRubyClass, "MONO16S", INT2NUM( DC1394_COLOR_CODING_MONO16S ) );
+  rb_define_const( cRubyClass,  "RGB16S", INT2NUM(  DC1394_COLOR_CODING_RGB16S ) );
+  rb_define_const( cRubyClass,    "RAW8", INT2NUM(    DC1394_COLOR_CODING_RAW8 ) );
+  rb_define_const( cRubyClass,   "RAW16", INT2NUM(   DC1394_COLOR_CODING_RAW16 ) );
   rb_define_singleton_method( cRubyClass, "new",
                               RUBY_METHOD_FUNC( wrapNew ), 3 );
   rb_define_method( cRubyClass, "close",

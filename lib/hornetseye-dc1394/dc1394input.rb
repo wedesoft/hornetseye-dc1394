@@ -27,7 +27,18 @@ module Hornetseye
 
       def new( node = 0, speed = SPEED_400, &action )
         @@dc1394 = DC1394.new unless @@dc1394
-        orig_new @@dc1394, node, speed, &action
+        orig_new @@dc1394, node, speed do |modes|
+          map = { MONO8  => UBYTE,
+                  YUV422 => UYVY,
+                  RGB8   => UBYTERGB,
+                  MONO16 => USINT }
+          frame_types = []
+          modes.each do |mode|
+            target = map[ mode.first ]
+            frame_types.push Hornetseye::Frame( target, *mode[ 1 .. 2 ] ) if target
+          end
+          action.call frame_types
+        end
       end
 
     end

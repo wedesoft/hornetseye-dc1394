@@ -25,9 +25,11 @@ DC1394Select::~DC1394Select(void)
 {
 }
 
-void DC1394Select::add( dc1394color_coding_t coding )
+void DC1394Select::add( dc1394color_coding_t coding, unsigned int width,
+                        unsigned int height )
 {
-  rb_ary_push( m_rbArray, INT2NUM( coding ) );
+  rb_ary_push( m_rbArray, rb_ary_new3( 3, INT2NUM( coding ), INT2NUM( width ),
+                                       INT2NUM( height ) ) );
 }
 
 int DC1394Select::make(void) throw (Error)
