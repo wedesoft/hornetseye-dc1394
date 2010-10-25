@@ -64,10 +64,16 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
       };
     };
     int selection = select->make();
-    // ...
+    ERRORMACRO( selection >= 0 && selection < videoModes.num, Error, ,
+                "Index of selected video mode out of range" );
+    dc1394video_mode_t videoMode = videoModes.modes[ selection ];
     err = dc1394_video_set_iso_speed( m_camera, speed );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting iso speed: "
                 << dc1394_error_get_string( err ) );
+    err = dc1394_video_set_mode( m_camera, videoMode );
+    ERRORMACRO( err == DC1394_SUCCESS, Error, , "Failure setting video mode: "
+                << dc1394_error_get_string( err ) );
+    // frame rate ...
     err = dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not setup camera: "
                 << dc1394_error_get_string( err ) );

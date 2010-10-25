@@ -32,12 +32,22 @@ void DC1394Select::add( dc1394color_coding_t coding, unsigned int width,
                                        INT2NUM( height ) ) );
 }
 
+static VALUE yield( VALUE arg )
+{
+  return rb_yield( arg );
+}
+
 int DC1394Select::make(void) throw (Error)
 {
-  VALUE rbRetVal = rb_rescue( RUBY_METHOD_FUNC(rb_yield), m_rbArray,
-                              RUBY_METHOD_FUNC(wrapRescue), Qnil );
-  ERRORMACRO( TYPE(rbRetVal) == T_FIXNUM, Error, , "Error during selection of camera "
-              "resolution. Block must return a value of type 'Fixnum'." );
+  int error;
+  VALUE rbRetVal = rb_protect( yield, m_rbArray, &error );
+  if ( error ) {
+    VALUE rbError = rb_funcall( rb_gv_get( "$!" ), rb_intern( "message" ), 0 );
+    ERRORMACRO( false, Error, , "Error in block to \"DC1394Input.new\": "
+                << StringValuePtr( rbError ) );
+  };
+  ERRORMACRO( TYPE( rbRetVal ) == T_FIXNUM, Error, , "Block must return a value of "
+              "type 'Fixnum'" );
   return NUM2INT(rbRetVal);
 }
 

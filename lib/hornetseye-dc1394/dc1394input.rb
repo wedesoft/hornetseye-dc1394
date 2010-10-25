@@ -32,12 +32,15 @@ module Hornetseye
                   YUV422 => UYVY,
                   RGB8   => UBYTERGB,
                   MONO16 => USINT }
-          frame_types = []
-          modes.each do |mode|
+          frame_types, index = [], []
+          modes.each_with_index do |mode,i|
             target = map[ mode.first ]
-            frame_types.push Hornetseye::Frame( target, *mode[ 1 .. 2 ] ) if target
+            if target
+              frame_types.push Hornetseye::Frame( target, *mode[ 1 .. 2 ] )
+              index.push i
+            end
           end
-          action.call frame_types
+          index[ action.call( frame_types ) ]
         end
       end
 
