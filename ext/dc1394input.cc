@@ -13,26 +13,25 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-#include <boost/array.hpp>
+// #include <boost/array.hpp>
 #ifndef NDEBUG
 #include <iostream>
 #endif
-#include <malloc.h>
-#include <map>
-#include <sstream>
 #include "rubytools.hh"
 #include "dc1394input.hh"
-
-// http://v4l2spec.bytesex.org/spec-single/v4l2.html
 
 using namespace boost;
 using namespace std;
 
 VALUE DC1394Input::cRubyClass = Qnil;
 
-DC1394Input::DC1394Input(void) throw (Error)
+DC1394Input::DC1394Input( DC1394 *dc1394 ) throw (Error)
 {
   try {
+    //ERRORMACRO( m_dc1394 != NULL, Error, , "Unable to acquire raw1394 handle. Please "
+    //            "check, whether the kernel modules 'ieee1394', 'raw1394', and "
+    //            "'ohci1394' are loaded and whether you have read/write permission on "
+    //            "\"/dev/raw1394\"" );
   } catch ( Error &e ) {
     close();
     throw e;
@@ -64,7 +63,7 @@ VALUE DC1394Input::registerRubyClass( VALUE module )
 {
   cRubyClass = rb_define_class_under( module, "DC1394Input", rb_cObject );
   rb_define_singleton_method( cRubyClass, "new",
-                              RUBY_METHOD_FUNC( wrapNew ), 0 );
+                              RUBY_METHOD_FUNC( wrapNew ), 1 );
   rb_define_method( cRubyClass, "close",
                     RUBY_METHOD_FUNC( wrapClose ), 0 );
   rb_define_method( cRubyClass, "read",
@@ -79,11 +78,12 @@ void DC1394Input::deleteRubyObject( void *ptr )
   delete (DC1394InputPtr *)ptr;
 }
 
-VALUE DC1394Input::wrapNew( VALUE rbClass )
+VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394 )
 {
   VALUE retVal = Qnil;
   try {
-    DC1394InputPtr ptr( new DC1394Input );
+    DC1394Ptr *dc1394; Data_Get_Struct( rbDC1394, DC1394Ptr, dc1394 );
+    DC1394InputPtr ptr( new DC1394Input( dc1394->get() ) );
     retVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
                                new DC1394InputPtr( ptr ) );
   } catch ( std::exception &e ) {

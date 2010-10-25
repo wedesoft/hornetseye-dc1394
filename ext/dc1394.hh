@@ -13,35 +13,33 @@
    
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-#ifndef HORNETSEYE_DC1394INPUT_HH
-#define HORNETSEYE_DC1394INPUT_HH
+#ifndef HORNETSEYE_DC1394_HH
+#define HORNETSEYE_DC1394_HH
 
-#include <errno.h>
+#include <boost/smart_ptr.hpp>
+#include <dc1394/dc1394.h>
 #include "error.hh"
-#include "dc1394.hh"
-#include "frame.hh"
 
-class DC1394Input
+class DC1394
 {
 public:
-  DC1394Input( DC1394 *dc1394 ) throw (Error); // two cameras?
-  virtual ~DC1394Input(void);
+  DC1394(void) throw (Error);
+  virtual ~DC1394(void);
   void close(void);
-  FramePtr read(void) throw (Error);
   bool status(void) const;
   std::string inspect(void) const;
+  dc1394_t *get(void) { return m_dc1394; }
   static VALUE cRubyClass;
   static VALUE registerRubyClass( VALUE module );
   static void deleteRubyObject( void *ptr );
-  static VALUE wrapNew( VALUE rbClass, VALUE rbDC1394 );
+  static VALUE wrapNew( VALUE rbClass );
   static VALUE wrapClose( VALUE rbSelf );
-  static VALUE wrapRead( VALUE rbSelf );
   static VALUE wrapStatus( VALUE rbSelf );
 protected:
-  std::string m_device;
+  dc1394_t *m_dc1394;
 };
   
-typedef boost::shared_ptr< DC1394Input > DC1394InputPtr;
+typedef boost::shared_ptr< DC1394 > DC1394Ptr;
 
 #endif
 

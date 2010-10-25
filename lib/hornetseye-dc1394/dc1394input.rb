@@ -21,10 +21,13 @@ module Hornetseye
 
     class << self
 
+      @@dc1394 = nil
+
       alias_method :orig_new, :new
 
       def new
-        orig_new
+        @@dc1394 = DC1394.new unless @@dc1394
+        orig_new @@dc1394
       end
 
     end

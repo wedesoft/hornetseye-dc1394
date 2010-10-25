@@ -14,6 +14,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "rubyinc.hh"
+#include "dc1394.hh"
 #include "dc1394input.hh"
 
 #ifdef WIN32
@@ -32,6 +33,7 @@ extern "C" {
   {
     rb_require( "hornetseye_frame" );
     VALUE rbHornetseye = rb_define_module( "Hornetseye" );
+    DC1394::registerRubyClass( rbHornetseye );
     DC1394Input::registerRubyClass( rbHornetseye );
     rb_require( "hornetseye_dc1394_ext.rb" );
   }
