@@ -28,7 +28,7 @@ public:
   void close(void);
   bool status(void) const;
   std::string inspect(void) const;
-  dc1394_t *get(void) { return m_dc1394; }
+  dc1394_t *get(void) throw (Error);
   static VALUE cRubyClass;
   static VALUE registerRubyClass( VALUE module );
   static void deleteRubyObject( void *ptr );

@@ -24,7 +24,7 @@
 class DC1394Input
 {
 public:
-  DC1394Input( DC1394 *dc1394 ) throw (Error); // two cameras?
+  DC1394Input( DC1394 *dc1394, int node ) throw (Error); // two cameras?
   virtual ~DC1394Input(void);
   void close(void);
   FramePtr read(void) throw (Error);
@@ -33,7 +33,7 @@ public:
   static VALUE cRubyClass;
   static VALUE registerRubyClass( VALUE module );
   static void deleteRubyObject( void *ptr );
-  static VALUE wrapNew( VALUE rbClass, VALUE rbDC1394 );
+  static VALUE wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode );
   static VALUE wrapClose( VALUE rbSelf );
   static VALUE wrapRead( VALUE rbSelf );
   static VALUE wrapStatus( VALUE rbSelf );

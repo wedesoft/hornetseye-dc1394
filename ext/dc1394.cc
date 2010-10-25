@@ -58,6 +58,13 @@ string DC1394::inspect(void) const
   return s.str();
 }
 
+dc1394_t *DC1394::get(void) throw (Error)
+{
+  ERRORMACRO( m_dc1394 != NULL, Error, , "DC1394 library is not initialised. "
+              "Did you call \"DC1394#close\" before?" );
+  return m_dc1394;
+}
+
 bool DC1394::status(void) const
 {
   return true;
