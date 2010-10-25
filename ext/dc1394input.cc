@@ -136,6 +136,14 @@ VALUE DC1394Input::registerRubyClass( VALUE module )
   rb_define_const( cRubyClass,  "RGB16S", INT2NUM(  DC1394_COLOR_CODING_RGB16S ) );
   rb_define_const( cRubyClass,    "RAW8", INT2NUM(    DC1394_COLOR_CODING_RAW8 ) );
   rb_define_const( cRubyClass,   "RAW16", INT2NUM(   DC1394_COLOR_CODING_RAW16 ) );
+  rb_define_const( cRubyClass, "FRAMERATE_1_875", INT2NUM( DC1394_FRAMERATE_1_875 ) );
+  rb_define_const( cRubyClass, "FRAMERATE_3_75" , INT2NUM( DC1394_FRAMERATE_3_75  ) );
+  rb_define_const( cRubyClass, "FRAMERATE_7_5"  , INT2NUM( DC1394_FRAMERATE_7_5   ) );
+  rb_define_const( cRubyClass, "FRAMERATE_15"   , INT2NUM( DC1394_FRAMERATE_15    ) );
+  rb_define_const( cRubyClass, "FRAMERATE_30"   , INT2NUM( DC1394_FRAMERATE_30    ) );
+  rb_define_const( cRubyClass, "FRAMERATE_60"   , INT2NUM( DC1394_FRAMERATE_60    ) );
+  rb_define_const( cRubyClass, "FRAMERATE_120"  , INT2NUM( DC1394_FRAMERATE_120   ) );
+  rb_define_const( cRubyClass, "FRAMERATE_240"  , INT2NUM( DC1394_FRAMERATE_240   ) );
   rb_define_singleton_method( cRubyClass, "new",
                               RUBY_METHOD_FUNC( wrapNew ), 3 );
   rb_define_method( cRubyClass, "close",
