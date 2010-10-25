@@ -24,7 +24,7 @@
 class DC1394Input
 {
 public:
-  DC1394Input( DC1394 *dc1394, int node ) throw (Error); // two cameras?
+  DC1394Input( DC1394Ptr dc1394, int node ) throw (Error); // two cameras?
   virtual ~DC1394Input(void);
   void close(void);
   FramePtr read(void) throw (Error);
@@ -38,9 +38,11 @@ public:
   static VALUE wrapRead( VALUE rbSelf );
   static VALUE wrapStatus( VALUE rbSelf );
 protected:
-  std::string m_device;
+  DC1394Ptr m_dc1394;
+  int m_node;
+  dc1394camera_t *m_camera;
 };
-  
+
 typedef boost::shared_ptr< DC1394Input > DC1394InputPtr;
 
 #endif

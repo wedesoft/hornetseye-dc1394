@@ -28,27 +28,13 @@ VALUE DC1394::cRubyClass = Qnil;
 DC1394::DC1394(void) throw (Error):
   m_dc1394(NULL)
 {
-  try {
-    m_dc1394 = dc1394_new();
-    ERRORMACRO( m_dc1394 != NULL, Error, , "Error initialising DC1394 library" );
-    
-  } catch ( Error &e ) {
-    close();
-    throw e;
-  };
+  m_dc1394 = dc1394_new();
+  ERRORMACRO( m_dc1394 != NULL, Error, , "Error initialising DC1394 library" );
 }
 
 DC1394::~DC1394(void)
 {
-  close();
-}
-
-void DC1394::close(void)
-{
-  if ( m_dc1394 != NULL ) {
-    dc1394_free( m_dc1394 );
-    m_dc1394 = NULL;
-  };
+  dc1394_free( m_dc1394 );
 }
 
 string DC1394::inspect(void) const
@@ -58,27 +44,11 @@ string DC1394::inspect(void) const
   return s.str();
 }
 
-dc1394_t *DC1394::get(void) throw (Error)
-{
-  ERRORMACRO( m_dc1394 != NULL, Error, , "DC1394 library is not initialised. "
-              "Did you call \"DC1394#close\" before?" );
-  return m_dc1394;
-}
-
-bool DC1394::status(void) const
-{
-  return true;
-}
-
 VALUE DC1394::registerRubyClass( VALUE module )
 {
   cRubyClass = rb_define_class_under( module, "DC1394", rb_cObject );
   rb_define_singleton_method( cRubyClass, "new",
                               RUBY_METHOD_FUNC( wrapNew ), 0 );
-  rb_define_method( cRubyClass, "close",
-                    RUBY_METHOD_FUNC( wrapClose ), 0 );
-  rb_define_method( cRubyClass, "status?",
-                    RUBY_METHOD_FUNC( wrapStatus ), 0 );
   return cRubyClass;
 }
 
@@ -98,18 +68,5 @@ VALUE DC1394::wrapNew( VALUE rbClass )
     rb_raise( rb_eRuntimeError, "%s", e.what() );
   };
   return retVal;
-}
-
-VALUE DC1394::wrapClose( VALUE rbSelf )
-{
-  DC1394Ptr *self; Data_Get_Struct( rbSelf, DC1394Ptr, self );
-  (*self)->close();
-  return rbSelf;
-}
-
-VALUE DC1394::wrapStatus( VALUE rbSelf )
-{
-  DC1394Ptr *self; Data_Get_Struct( rbSelf, DC1394Ptr, self );
-  return (*self)->status() ? Qtrue : Qfalse;
 }
 

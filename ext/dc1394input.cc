@@ -16,6 +16,7 @@
 #ifndef NDEBUG
 #include <iostream>
 #endif
+#include <iomanip>
 #include "rubytools.hh"
 #include "dc1394input.hh"
 
@@ -24,7 +25,8 @@ using namespace std;
 
 VALUE DC1394Input::cRubyClass = Qnil;
 
-DC1394Input::DC1394Input( DC1394 *dc1394, int node ) throw (Error)
+DC1394Input::DC1394Input( DC1394Ptr dc1394, int node ) throw (Error):
+  m_dc1394( dc1394 ), m_node( node ), m_camera( NULL )
 {
   dc1394camera_list_t *list = NULL;
   try {
@@ -37,6 +39,14 @@ DC1394Input::DC1394Input( DC1394 *dc1394, int node ) throw (Error)
                 "'ieee1394','raw1394' and 'ohci1394' are loaded and whether you "
                 "have read/write permission on \"/dev/raw1394\". Also make sure "
                 "that the camera is connected and powered up." );
+    ERRORMACRO( node >= 0 && node < list->num, Error, ,
+                "Camera node number " << node << " out of range. The raange is "
+                "[ 0; " << list->num << " )" );
+    m_camera = dc1394_camera_new( dc1394->get(), list->ids[ node ].guid );
+    ERRORMACRO( m_camera != NULL, Error, , "Failed to initialise camera node "
+               << node << " (guid 0x" << setbase( 16 ) << list->ids[ node ].guid
+               << setbase( 10 ) << ")" );
+    // dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
     dc1394_camera_free_list( list ); list = NULL;
     //ERRORMACRO( m_dc1394 != NULL, Error, , "Unable to acquire raw1394 handle. Please "
     //            "check, whether the kernel modules 'ieee1394', 'raw1394', and "
@@ -56,12 +66,17 @@ DC1394Input::~DC1394Input(void)
 
 void DC1394Input::close(void)
 {
+  if ( m_camera != NULL ) {
+    dc1394_camera_free( m_camera );
+    m_camera = NULL;
+  };
+  m_dc1394.reset();
 }
 
 string DC1394Input::inspect(void) const
 {
   ostringstream s;
-  s << "DC1394Input( '" << m_device << "' )";
+  s << "DC1394Input( '" << m_node << "' )";
   return s.str();
 }
 
@@ -94,7 +109,7 @@ VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode )
   VALUE retVal = Qnil;
   try {
     DC1394Ptr *dc1394; Data_Get_Struct( rbDC1394, DC1394Ptr, dc1394 );
-    DC1394InputPtr ptr( new DC1394Input( dc1394->get(), NUM2INT( rbNode ) ) );
+    DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2INT( rbNode ) ) );
     retVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
                                new DC1394InputPtr( ptr ) );
   } catch ( std::exception &e ) {
