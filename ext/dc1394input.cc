@@ -25,7 +25,8 @@ using namespace std;
 
 VALUE DC1394Input::cRubyClass = Qnil;
 
-DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed )
+DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
+                          DC1394SelectPtr select )
   throw (Error):
   m_dc1394( dc1394 ), m_node( node ), m_camera( NULL )
 {
@@ -48,6 +49,17 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed )
     ERRORMACRO( m_camera != NULL, Error, , "Failed to initialise camera node "
                << node << " (guid 0x" << setbase( 16 ) << list->ids[ node ].guid
                << setbase( 10 ) << ")" );
+    dc1394video_modes_t videoModes;
+    err = dc1394_video_get_supported_modes( m_camera, &videoModes );
+    for ( int i=0; i<videoModes.num; i++ ) {
+      if ( !dc1394_is_video_mode_scalable( videoModes.modes[i] ) ) {
+        dc1394color_coding_t coding;
+        dc1394_get_color_coding_from_video_mode( m_camera, videoModes.modes[i],
+                                                 &coding );
+        select->add( coding );
+      };
+    };
+    int selection = select->make();
     // ...
     err = dc1394_video_set_iso_speed( m_camera, speed );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting iso speed: "
@@ -125,8 +137,10 @@ VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
   VALUE retVal = Qnil;
   try {
     DC1394Ptr *dc1394; Data_Get_Struct( rbDC1394, DC1394Ptr, dc1394 );
+    DC1394SelectPtr select( new DC1394Select );
     DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2INT( rbNode ),
-                                         (dc1394speed_t)NUM2INT( rbSpeed ) ) );
+                                         (dc1394speed_t)NUM2INT( rbSpeed ),
+                                         select ) );
     retVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
                                new DC1394InputPtr( ptr ) );
   } catch ( std::exception &e ) {

@@ -19,12 +19,14 @@
 #include <errno.h>
 #include "error.hh"
 #include "dc1394.hh"
+#include "dc1394select.hh"
 #include "frame.hh"
 
 class DC1394Input
 {
 public:
-  DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed ) throw (Error);
+  DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
+               DC1394SelectPtr select ) throw (Error);
   virtual ~DC1394Input(void);
   void close(void);
   FramePtr read(void) throw (Error);
