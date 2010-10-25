@@ -43,15 +43,20 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node ) throw (Error):
                 "Camera node number " << node << " out of range. The raange is "
                 "[ 0; " << list->num << " )" );
     m_camera = dc1394_camera_new( dc1394->get(), list->ids[ node ].guid );
+    dc1394_camera_free_list( list ); list = NULL;
     ERRORMACRO( m_camera != NULL, Error, , "Failed to initialise camera node "
                << node << " (guid 0x" << setbase( 16 ) << list->ids[ node ].guid
                << setbase( 10 ) << ")" );
-    // dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
-    dc1394_camera_free_list( list ); list = NULL;
-    //ERRORMACRO( m_dc1394 != NULL, Error, , "Unable to acquire raw1394 handle. Please "
-    //            "check, whether the kernel modules 'ieee1394', 'raw1394', and "
-    //            "'ohci1394' are loaded and whether you have read/write permission on "
-    //            "\"/dev/raw1394\"" );
+    // ...
+    err = dc1394_video_set_iso_speed( m_camera, DC1394_ISO_SPEED_400 );
+    ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting iso speed: "
+                << dc1394_error_get_string( err ) );
+    err = dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
+    ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not setup camera: "
+                << dc1394_error_get_string( err ) );
+    err = dc1394_video_set_transmission( m_camera, DC1394_ON );
+    ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not start camera iso "
+                "transmission: " << dc1394_error_get_string( err ) );
   } catch ( Error &e ) {
     if ( list != NULL ) dc1394_camera_free_list( list );
     close();
@@ -67,6 +72,9 @@ DC1394Input::~DC1394Input(void)
 void DC1394Input::close(void)
 {
   if ( m_camera != NULL ) {
+    dc1394_video_set_transmission( m_camera, DC1394_OFF );
+    dc1394_capture_stop( m_camera );
+    dc1394_camera_set_power( m_camera, DC1394_OFF );
     dc1394_camera_free( m_camera );
     m_camera = NULL;
   };
