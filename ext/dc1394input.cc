@@ -26,9 +26,10 @@ using namespace std;
 VALUE DC1394Input::cRubyClass = Qnil;
 
 DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
-                          DC1394SelectPtr select )
+                          DC1394SelectPtr select, bool forceFrameRate,
+                          dc1394framerate_t frameRate )
   throw (Error):
-  m_dc1394( dc1394 ), m_node( node ), m_camera( NULL )
+  m_dc1394( dc1394 ), m_node( node ), m_camera( NULL ), m_frame( NULL )
 {
   dc1394camera_list_t *list = NULL;
   try {
@@ -42,7 +43,7 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
                 "have read/write permission on \"/dev/raw1394\". Also make sure "
                 "that the camera is connected and powered up." );
     ERRORMACRO( node >= 0 && node < list->num, Error, ,
-                "Camera node number " << node << " out of range. The raange is "
+                "Camera node number " << node << " out of range. The range is "
                 "[ 0; " << list->num << " )" );
     m_camera = dc1394_camera_new( dc1394->get(), list->ids[ node ].guid );
     dc1394_camera_free_list( list ); list = NULL;
@@ -73,9 +74,23 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
     err = dc1394_video_set_mode( m_camera, videoMode );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Failure setting video mode: "
                 << dc1394_error_get_string( err ) );
-    // frame rate ...
+    if ( forceFrameRate ) {
+      err = dc1394_video_set_framerate( m_camera, frameRate );
+      ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
+                  << dc1394_error_get_string( err ) );
+    } else {
+      dc1394framerates_t frameRates;
+      err = dc1394_video_get_supported_framerates( m_camera, videoMode, &frameRates );
+      ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying supported frame "
+                  "rates: " << dc1394_error_get_string( err ) );
+      err = dc1394_video_set_framerate( m_camera,
+                                        frameRates.framerates[ frameRates.num - 1 ] );
+      ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
+                  << dc1394_error_get_string( err ) );
+    };
     err = dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
-    ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not setup camera: "
+    ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not setup camera (video mode "
+                "and framerate not supported?): "
                 << dc1394_error_get_string( err ) );
     err = dc1394_video_set_transmission( m_camera, DC1394_ON );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not start camera iso "
@@ -144,14 +159,10 @@ VALUE DC1394Input::registerRubyClass( VALUE module )
   rb_define_const( cRubyClass, "FRAMERATE_60"   , INT2NUM( DC1394_FRAMERATE_60    ) );
   rb_define_const( cRubyClass, "FRAMERATE_120"  , INT2NUM( DC1394_FRAMERATE_120   ) );
   rb_define_const( cRubyClass, "FRAMERATE_240"  , INT2NUM( DC1394_FRAMERATE_240   ) );
-  rb_define_singleton_method( cRubyClass, "new",
-                              RUBY_METHOD_FUNC( wrapNew ), 3 );
-  rb_define_method( cRubyClass, "close",
-                    RUBY_METHOD_FUNC( wrapClose ), 0 );
-  rb_define_method( cRubyClass, "read",
-                    RUBY_METHOD_FUNC( wrapRead ), 0 );
-  rb_define_method( cRubyClass, "status?",
-                    RUBY_METHOD_FUNC( wrapStatus ), 0 );
+  rb_define_singleton_method( cRubyClass, "new", RUBY_METHOD_FUNC( wrapNew ), 5 );
+  rb_define_method( cRubyClass, "close", RUBY_METHOD_FUNC( wrapClose ), 0 );
+  rb_define_method( cRubyClass, "read", RUBY_METHOD_FUNC( wrapRead ), 0 );
+  rb_define_method( cRubyClass, "status?", RUBY_METHOD_FUNC( wrapStatus ), 0 );
   return cRubyClass;
 }
 
@@ -161,7 +172,7 @@ void DC1394Input::deleteRubyObject( void *ptr )
 }
 
 VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
-                            VALUE rbSpeed )
+                            VALUE rbSpeed, VALUE rbForceFrameRate, VALUE rbFrameRate )
 {
   VALUE retVal = Qnil;
   try {
@@ -169,7 +180,8 @@ VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
     DC1394SelectPtr select( new DC1394Select );
     DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2INT( rbNode ),
                                          (dc1394speed_t)NUM2INT( rbSpeed ),
-                                         select ) );
+                                         select, rbForceFrameRate != Qfalse,
+                                         (dc1394framerate_t)NUM2INT( rbFrameRate ) ) );
     retVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
                                new DC1394InputPtr( ptr ) );
   } catch ( std::exception &e ) {

@@ -25,9 +25,10 @@ module Hornetseye
 
       alias_method :orig_new, :new
 
-      def new( node = 0, speed = SPEED_400, &action )
+      def new( node = 0, speed = SPEED_400, frame_rate = nil, &action )
         @@dc1394 = DC1394.new unless @@dc1394
-        orig_new @@dc1394, node, speed do |modes|
+        orig_new @@dc1394, node, speed, frame_rate != nil,
+                 frame_rate || FRAMERATE_240 do |modes|
           map = { MONO8  => UBYTE,
                   YUV422 => UYVY,
                   RGB8   => UBYTERGB,

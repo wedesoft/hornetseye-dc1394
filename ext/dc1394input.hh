@@ -26,7 +26,8 @@ class DC1394Input
 {
 public:
   DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
-               DC1394SelectPtr select ) throw (Error);
+               DC1394SelectPtr select, bool forceFrameRate,
+               dc1394framerate_t frameRate ) throw (Error);
   virtual ~DC1394Input(void);
   void close(void);
   FramePtr read(void) throw (Error);
@@ -35,7 +36,8 @@ public:
   static VALUE cRubyClass;
   static VALUE registerRubyClass( VALUE module );
   static void deleteRubyObject( void *ptr );
-  static VALUE wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode, VALUE rbSpeed );
+  static VALUE wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode, VALUE rbSpeed,
+                        VALUE rbForceFrameRate, VALUE rbFrameRate );
   static VALUE wrapClose( VALUE rbSelf );
   static VALUE wrapRead( VALUE rbSelf );
   static VALUE wrapStatus( VALUE rbSelf );
@@ -43,6 +45,7 @@ protected:
   DC1394Ptr m_dc1394;
   int m_node;
   dc1394camera_t *m_camera;
+  dc1394video_frame_t *m_frame;
 };
 
 typedef boost::shared_ptr< DC1394Input > DC1394InputPtr;
