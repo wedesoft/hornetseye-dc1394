@@ -1,5 +1,5 @@
 /* HornetsEye - Computer Vision with Ruby
- Copyright (C) 2006, 2007, 2008, 2009 Jan Wedekind
+ Copyright (C) 2006, 2007, 2008, 2009, 2010 Jan Wedekind
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -150,6 +150,11 @@ FramePtr DC1394Input::read(void) throw (Error)
                               (char *)m_frame->image ) );
 }
 
+bool DC1394Input::status(void) const
+{
+  return m_camera != NULL;
+}
+
 string DC1394Input::inspect(void) const
 {
   ostringstream s;
@@ -157,9 +162,136 @@ string DC1394Input::inspect(void) const
   return s.str();
 }
 
-bool DC1394Input::status(void) const
+unsigned int DC1394Input::featureGetValue( dc1394feature_t feature ) throw (Error)
 {
-  return m_camera != NULL;
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  uint32_t value;
+  dc1394error_t err = dc1394_feature_get_value( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error reading feature value: "
+              << dc1394_error_get_string( err ) );
+  return value;
+}
+
+void DC1394Input::featureSetValue( dc1394feature_t feature, unsigned int value ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394error_t err = dc1394_feature_set_value( m_camera, feature, value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error writing feature value: "
+              << dc1394_error_get_string( err ) );
+}
+
+bool DC1394Input::featureIsPresent( dc1394feature_t feature ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394bool_t value;
+  dc1394error_t err = dc1394_feature_is_present( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error checking presence of feature: "
+              << dc1394_error_get_string( err ) );
+  return value != DC1394_FALSE;
+}
+
+bool DC1394Input::featureIsReadable( dc1394feature_t feature ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394bool_t value;
+  dc1394error_t err = dc1394_feature_is_readable( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error checking whether feature is "
+              "readable: " << dc1394_error_get_string( err ) );
+  return value != DC1394_FALSE;
+}
+
+bool DC1394Input::featureIsSwitchable( dc1394feature_t feature ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394bool_t value;
+  dc1394error_t err = dc1394_feature_is_switchable( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error checking whether feature is "
+              "switchable: " << dc1394_error_get_string( err ) );
+  return value != DC1394_FALSE;
+}
+
+dc1394switch_t DC1394Input::featureGetPower( dc1394feature_t feature ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394switch_t value;
+  dc1394error_t err = dc1394_feature_get_power( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error checking power status of "
+              "feature: " << dc1394_error_get_string( err ) );
+  return value;
+}
+
+void DC1394Input::featureSetPower( dc1394feature_t feature, dc1394switch_t value )
+  throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394error_t err = dc1394_feature_set_power( m_camera, feature, value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting power status of "
+              "feature: " << dc1394_error_get_string( err ) );
+}
+
+dc1394feature_modes_t DC1394Input::featureModes( dc1394feature_t feature )
+  throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394feature_modes_t value;
+  dc1394error_t err = dc1394_feature_get_modes( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying list of control modes "
+              "for a feature: " << dc1394_error_get_string( err ) );
+  return value;
+}
+
+dc1394feature_mode_t DC1394Input::featureModeGet( dc1394feature_t feature )
+  throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394feature_mode_t value;
+  dc1394error_t err = dc1394_feature_get_mode( m_camera, feature, &value );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying current mode of "
+              "feature: " << dc1394_error_get_string( err ) );
+  return value;
+}
+
+void DC1394Input::featureModeSet( dc1394feature_t feature, dc1394feature_mode_t mode )
+ throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394error_t err = dc1394_feature_set_mode( m_camera, feature, mode );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting mode of feature: "
+              << dc1394_error_get_string( err ) );
+}
+
+unsigned int DC1394Input::featureMin( dc1394feature_t feature ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394feature_info_t info;
+  info.id = feature;
+  dc1394error_t err = dc1394_feature_get( m_camera, &info );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying minimum value of "
+              "feature: " << dc1394_error_get_string( err ) );
+  return info.min;
+}
+
+unsigned int DC1394Input::featureMax( dc1394feature_t feature ) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  dc1394feature_info_t info;
+  info.id = feature;
+  dc1394error_t err = dc1394_feature_get( m_camera, &info );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying minimum value of "
+              "feature: " << dc1394_error_get_string( err ) );
+  return info.max;
 }
 
 VALUE DC1394Input::registerRubyClass( VALUE module )
@@ -190,10 +322,88 @@ VALUE DC1394Input::registerRubyClass( VALUE module )
   rb_define_const( cRubyClass, "FRAMERATE_60"   , INT2NUM( DC1394_FRAMERATE_60    ) );
   rb_define_const( cRubyClass, "FRAMERATE_120"  , INT2NUM( DC1394_FRAMERATE_120   ) );
   rb_define_const( cRubyClass, "FRAMERATE_240"  , INT2NUM( DC1394_FRAMERATE_240   ) );
+  rb_define_const( cRubyClass, "FEATURE_MIN",
+                   INT2NUM( DC1394_FEATURE_MIN ) );
+  rb_define_const( cRubyClass, "FEATURE_BRIGHTNESS",
+                   INT2NUM( DC1394_FEATURE_BRIGHTNESS ) );
+  rb_define_const( cRubyClass, "FEATURE_EXPOSURE",
+                   INT2NUM( DC1394_FEATURE_EXPOSURE ) );
+  rb_define_const( cRubyClass, "FEATURE_SHARPNESS",
+                   INT2NUM( DC1394_FEATURE_SHARPNESS ) );
+  rb_define_const( cRubyClass, "FEATURE_WHITE_BALANCE",
+                   INT2NUM( DC1394_FEATURE_WHITE_BALANCE ) );
+  rb_define_const( cRubyClass, "FEATURE_HUE",
+                   INT2NUM( DC1394_FEATURE_HUE ) );
+  rb_define_const( cRubyClass, "FEATURE_SATURATION",
+                   INT2NUM( DC1394_FEATURE_SATURATION ) );
+  rb_define_const( cRubyClass, "FEATURE_GAMMA",
+                   INT2NUM( DC1394_FEATURE_GAMMA ) );
+  rb_define_const( cRubyClass, "FEATURE_SHUTTER",
+                   INT2NUM( DC1394_FEATURE_SHUTTER ) );
+  rb_define_const( cRubyClass, "FEATURE_GAIN",
+                   INT2NUM( DC1394_FEATURE_GAIN ) );
+  rb_define_const( cRubyClass, "FEATURE_IRIS",
+                   INT2NUM( DC1394_FEATURE_IRIS ) );
+  rb_define_const( cRubyClass, "FEATURE_FOCUS",
+                   INT2NUM( DC1394_FEATURE_FOCUS ) );
+  rb_define_const( cRubyClass, "FEATURE_TEMPERATURE",
+                   INT2NUM( DC1394_FEATURE_TEMPERATURE ) );
+  rb_define_const( cRubyClass, "FEATURE_TRIGGER",
+                   INT2NUM( DC1394_FEATURE_TRIGGER ) );
+  rb_define_const( cRubyClass, "FEATURE_TRIGGER_DELAY",
+                   INT2NUM( DC1394_FEATURE_TRIGGER_DELAY ) );
+  rb_define_const( cRubyClass, "FEATURE_WHITE_SHADING",
+                   INT2NUM( DC1394_FEATURE_WHITE_SHADING ) );
+  rb_define_const( cRubyClass, "FEATURE_FRAME_RATE",
+                   INT2NUM( DC1394_FEATURE_FRAME_RATE ) );
+  rb_define_const( cRubyClass, "FEATURE_ZOOM",
+                   INT2NUM( DC1394_FEATURE_ZOOM ) );
+  rb_define_const( cRubyClass, "FEATURE_PAN",
+                   INT2NUM( DC1394_FEATURE_PAN ) );
+  rb_define_const( cRubyClass, "FEATURE_TILT",
+                   INT2NUM( DC1394_FEATURE_TILT ) );
+  rb_define_const( cRubyClass, "FEATURE_OPTICAL_FILTER",
+                   INT2NUM( DC1394_FEATURE_OPTICAL_FILTER ) );
+  rb_define_const( cRubyClass, "FEATURE_CAPTURE_SIZE",
+                   INT2NUM( DC1394_FEATURE_CAPTURE_SIZE ) );
+  rb_define_const( cRubyClass, "FEATURE_CAPTURE_QUALITY",
+                   INT2NUM( DC1394_FEATURE_CAPTURE_QUALITY ) );
+  rb_define_const( cRubyClass, "FEATURE_MAX",
+                   INT2NUM( DC1394_FEATURE_MAX ) );
+  rb_define_const( cRubyClass, "FEATURE_MODE_MANUAL",
+                   INT2NUM( DC1394_FEATURE_MODE_MANUAL ) );
+  rb_define_const( cRubyClass, "FEATURE_MODE_AUTO",
+                   INT2NUM( DC1394_FEATURE_MODE_AUTO ) );
+  rb_define_const( cRubyClass, "FEATURE_MODE_ONE_PUSH_AUTO",
+                   INT2NUM( DC1394_FEATURE_MODE_ONE_PUSH_AUTO ) );
   rb_define_singleton_method( cRubyClass, "new", RUBY_METHOD_FUNC( wrapNew ), 5 );
   rb_define_method( cRubyClass, "close", RUBY_METHOD_FUNC( wrapClose ), 0 );
   rb_define_method( cRubyClass, "read", RUBY_METHOD_FUNC( wrapRead ), 0 );
   rb_define_method( cRubyClass, "status?", RUBY_METHOD_FUNC( wrapStatus ), 0 );
+  rb_define_method( cRubyClass, "feature_read",
+                    RUBY_METHOD_FUNC( wrapFeatureGetValue ), 1 );
+  rb_define_method( cRubyClass, "feature_write",
+                    RUBY_METHOD_FUNC( wrapFeatureSetValue ), 2 );
+  rb_define_method( cRubyClass, "feature_exist?",
+                    RUBY_METHOD_FUNC( wrapFeatureIsPresent ), 1 );
+  rb_define_method( cRubyClass, "feature_readable?",
+                    RUBY_METHOD_FUNC( wrapFeatureIsReadable ), 1 );
+  rb_define_method( cRubyClass, "feature_switchable?",
+                    RUBY_METHOD_FUNC( wrapFeatureIsSwitchable ), 1 );
+  rb_define_method( cRubyClass, "feature_on?",
+                    RUBY_METHOD_FUNC( wrapFeatureGetPower ), 1 );
+  rb_define_method( cRubyClass, "feature_on",
+                    RUBY_METHOD_FUNC( wrapFeatureSetPower ), 2 );
+  rb_define_method( cRubyClass, "feature_modes",
+                    RUBY_METHOD_FUNC( wrapFeatureModes ), 1 );
+  rb_define_method( cRubyClass, "feature_mode_read",
+                    RUBY_METHOD_FUNC( wrapFeatureModeGet ), 1 );
+  rb_define_method( cRubyClass, "feature_mode_write",
+                    RUBY_METHOD_FUNC( wrapFeatureModeSet ), 2 );
+  rb_define_method( cRubyClass, "feature_min",
+                    RUBY_METHOD_FUNC( wrapFeatureMin ), 1 );
+  rb_define_method( cRubyClass, "feature_max",
+                    RUBY_METHOD_FUNC( wrapFeatureMax ), 1 );
   return cRubyClass;
 }
 
@@ -205,7 +415,7 @@ void DC1394Input::deleteRubyObject( void *ptr )
 VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
                             VALUE rbSpeed, VALUE rbForceFrameRate, VALUE rbFrameRate )
 {
-  VALUE retVal = Qnil;
+  VALUE rbRetVal = Qnil;
   try {
     DC1394Ptr *dc1394; Data_Get_Struct( rbDC1394, DC1394Ptr, dc1394 );
     DC1394SelectPtr select( new DC1394Select );
@@ -213,12 +423,12 @@ VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
                                          (dc1394speed_t)NUM2INT( rbSpeed ),
                                          select, rbForceFrameRate != Qfalse,
                                          (dc1394framerate_t)NUM2INT( rbFrameRate ) ) );
-    retVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
-                               new DC1394InputPtr( ptr ) );
+    rbRetVal = Data_Wrap_Struct( rbClass, 0, deleteRubyObject,
+                                 new DC1394InputPtr( ptr ) );
   } catch ( std::exception &e ) {
     rb_raise( rb_eRuntimeError, "%s", e.what() );
   };
-  return retVal;
+  return rbRetVal;
 }
 
 VALUE DC1394Input::wrapClose( VALUE rbSelf )
@@ -230,15 +440,15 @@ VALUE DC1394Input::wrapClose( VALUE rbSelf )
 
 VALUE DC1394Input::wrapRead( VALUE rbSelf )
 {
-  VALUE retVal = Qnil;
+  VALUE rbRetVal = Qnil;
   try {
     DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
     FramePtr frame( (*self)->read() );
-    retVal = frame->rubyObject();
+    rbRetVal = frame->rubyObject();
   } catch ( std::exception &e ) {
     rb_raise( rb_eRuntimeError, "%s", e.what() );
   };
-  return retVal;
+  return rbRetVal;
 }
 
 VALUE DC1394Input::wrapStatus( VALUE rbSelf )
@@ -246,4 +456,163 @@ VALUE DC1394Input::wrapStatus( VALUE rbSelf )
   DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
   return (*self)->status() ? Qtrue : Qfalse;
 }
+
+VALUE DC1394Input::wrapFeatureGetValue( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    rbRetVal = UINT2NUM( (*self)->
+                         featureGetValue( (dc1394feature_t)NUM2INT( rbFeature ) ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureSetValue( VALUE rbSelf, VALUE rbFeature, VALUE rbValue )
+{
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    (*self)->featureSetValue( (dc1394feature_t)NUM2INT( rbFeature ),
+                              NUM2UINT( rbValue ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbValue;
+}
+
+VALUE DC1394Input::wrapFeatureIsPresent( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    bool retVal = (*self)->featureIsPresent( (dc1394feature_t)NUM2INT( rbFeature  ) );
+    rbRetVal = retVal ? Qtrue : Qfalse;
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureIsReadable( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    bool retVal = (*self)->featureIsReadable( (dc1394feature_t)NUM2INT( rbFeature  ) );
+    rbRetVal = retVal ? Qtrue : Qfalse;
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureIsSwitchable( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    bool retVal = (*self)->
+      featureIsSwitchable( (dc1394feature_t)NUM2INT( rbFeature ) );
+    rbRetVal = retVal ? Qtrue : Qfalse;
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureGetPower( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    dc1394switch_t retVal = (*self)->
+      featureGetPower( (dc1394feature_t)NUM2INT( rbFeature  ) );
+    rbRetVal = retVal != DC1394_OFF ? Qtrue : Qfalse;
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureSetPower( VALUE rbSelf, VALUE rbFeature, VALUE rbValue )
+{
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    (*self)->featureSetPower( (dc1394feature_t)NUM2INT( rbFeature ),
+                              rbValue == Qtrue ? DC1394_ON : DC1394_OFF );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbValue;
+}
+
+VALUE DC1394Input::wrapFeatureModes( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    dc1394feature_modes_t retVal = (*self)->
+      featureModes( (dc1394feature_t)NUM2INT( rbFeature ) );
+    rbRetVal = rb_ary_new();
+    for ( int i=0; i<retVal.num; i++ )
+      rb_ary_push( rbRetVal, INT2NUM( retVal.modes[i] ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureModeGet( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    rbRetVal = UINT2NUM( (*self)->
+                         featureModeGet( (dc1394feature_t)NUM2INT( rbFeature ) ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureModeSet( VALUE rbSelf, VALUE rbFeature, VALUE rbMode )
+{
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    (*self)->featureModeSet( (dc1394feature_t)NUM2INT( rbFeature ),
+                             (dc1394feature_mode_t)NUM2UINT( rbMode ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbMode;
+}
+
+VALUE DC1394Input::wrapFeatureMin( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    rbRetVal = UINT2NUM( (*self)->
+                         featureMin( (dc1394feature_t)NUM2INT( rbFeature ) ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
+VALUE DC1394Input::wrapFeatureMax( VALUE rbSelf, VALUE rbFeature )
+{
+  VALUE rbRetVal = Qnil;
+  try {
+    DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+    rbRetVal = UINT2NUM( (*self)->
+                         featureMax( (dc1394feature_t)NUM2INT( rbFeature ) ) );
+  } catch ( std::exception &e ) {
+    rb_raise( rb_eRuntimeError, "%s", e.what() );
+  };
+  return rbRetVal;
+}
+
 

@@ -33,6 +33,19 @@ public:
   FramePtr read(void) throw (Error);
   bool status(void) const;
   std::string inspect(void) const;
+  unsigned int featureGetValue( dc1394feature_t feature ) throw (Error);
+  void featureSetValue( dc1394feature_t feature, unsigned int value ) throw (Error);
+  bool featureIsPresent( dc1394feature_t feature ) throw (Error);
+  bool featureIsReadable( dc1394feature_t feature ) throw (Error);
+  bool featureIsSwitchable( dc1394feature_t feature ) throw (Error);
+  dc1394switch_t featureGetPower( dc1394feature_t feature ) throw (Error);
+  void featureSetPower( dc1394feature_t feature, dc1394switch_t value ) throw (Error);
+  dc1394feature_modes_t featureModes( dc1394feature_t feature ) throw (Error);
+  dc1394feature_mode_t featureModeGet( dc1394feature_t feature ) throw (Error);
+  void featureModeSet( dc1394feature_t feature, dc1394feature_mode_t mode )
+    throw (Error);
+  unsigned int featureMin( dc1394feature_t feature ) throw (Error);
+  unsigned int featureMax( dc1394feature_t feature ) throw (Error);
   static VALUE cRubyClass;
   static VALUE registerRubyClass( VALUE module );
   static void deleteRubyObject( void *ptr );
@@ -41,6 +54,18 @@ public:
   static VALUE wrapClose( VALUE rbSelf );
   static VALUE wrapRead( VALUE rbSelf );
   static VALUE wrapStatus( VALUE rbSelf );
+  static VALUE wrapFeatureGetValue( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureSetValue( VALUE rbSelf, VALUE rbFeature, VALUE rbValue );
+  static VALUE wrapFeatureIsPresent( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureIsReadable( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureIsSwitchable( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureGetPower( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureSetPower( VALUE rbSelf, VALUE rbFeature, VALUE rbValue );
+  static VALUE wrapFeatureModes( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureModeGet( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureModeSet( VALUE rbSelf, VALUE rbFeature, VALUE rbMode );
+  static VALUE wrapFeatureMin( VALUE rbSelf, VALUE rbFeature );
+  static VALUE wrapFeatureMax( VALUE rbSelf, VALUE rbFeature );
 protected:
   DC1394Ptr m_dc1394;
   int m_node;
