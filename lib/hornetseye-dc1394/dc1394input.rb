@@ -41,7 +41,11 @@ module Hornetseye
               index.push i
             end
           end
-          index[ action.call( frame_types ) ]
+          desired = action.call frame_types
+          unless frame_types.member? desired
+            raise "Frame type #{desired} not supported by camera" 
+          end
+          index[ frame_types.index( desired ) ]
         end
       end
 
