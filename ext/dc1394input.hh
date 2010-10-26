@@ -46,6 +46,9 @@ protected:
   int m_node;
   dc1394camera_t *m_camera;
   dc1394video_frame_t *m_frame;
+  std::string m_typecode;
+  unsigned int m_width;
+  unsigned int m_height;
 };
 
 typedef boost::shared_ptr< DC1394Input > DC1394InputPtr;

@@ -74,6 +74,21 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
     err = dc1394_video_set_mode( m_camera, videoMode );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Failure setting video mode: "
                 << dc1394_error_get_string( err ) );
+    dc1394color_coding_t coding;
+    dc1394_get_color_coding_from_video_mode( m_camera, videoMode, &coding );
+    if ( coding == DC1394_COLOR_CODING_MONO8 )
+      m_typecode = "UBYTE";
+    else if ( coding == DC1394_COLOR_CODING_YUV422 )
+      m_typecode = "UYVY";
+    else if ( coding == DC1394_COLOR_CODING_RGB8 )
+      m_typecode = "UBYTERGB";
+    else if ( coding == DC1394_COLOR_CODING_MONO16 )
+      m_typecode = "USINT";
+    else {
+      ERRORMACRO( false, Error, , "Conversion for DC1394 colorspace " << coding
+                  << " not implemented yet" );
+    };
+    dc1394_get_image_size_from_video_mode( m_camera, videoMode, &m_width, &m_height );
     if ( forceFrameRate ) {
       err = dc1394_video_set_framerate( m_camera, frameRate );
       ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
@@ -119,6 +134,22 @@ void DC1394Input::close(void)
   m_dc1394.reset();
 }
 
+FramePtr DC1394Input::read(void) throw (Error)
+{
+  ERRORMACRO( m_camera != NULL, Error, , "Camera device not open any more. Did you "
+              "call \"close\" before?" );
+  if ( m_frame != NULL ) {
+    dc1394_capture_enqueue( m_camera, m_frame );
+    m_frame = NULL;
+  };
+  dc1394error_t err = dc1394_capture_dequeue( m_camera, DC1394_CAPTURE_POLICY_WAIT,
+                                              &m_frame );
+  ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error capturing frame: "
+              << dc1394_error_get_string( err ) );
+  return FramePtr( new Frame( m_typecode, m_width, m_height,
+                              (char *)m_frame->image ) );
+}
+
 string DC1394Input::inspect(void) const
 {
   ostringstream s;
@@ -128,7 +159,7 @@ string DC1394Input::inspect(void) const
 
 bool DC1394Input::status(void) const
 {
-  return true;
+  return m_camera != NULL;
 }
 
 VALUE DC1394Input::registerRubyClass( VALUE module )
