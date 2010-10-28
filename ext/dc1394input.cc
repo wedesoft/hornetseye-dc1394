@@ -85,19 +85,24 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, unsigned int node, dc1394speed_t spe
                   << " not implemented yet" );
     };
     dc1394_get_image_size_from_video_mode( m_camera, videoMode, &m_width, &m_height );
-    if ( forceFrameRate ) {
-      err = dc1394_video_set_framerate( m_camera, frameRate );
-      ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
-                  << dc1394_error_get_string( err ) );
+    if ( dc1394_is_video_mode_scalable( videoMode ) ) {
+      ERRORMACRO( !forceFrameRate, Error, , "Cannot set framerate in format6 or "
+                  "format7 mode" );
     } else {
-      dc1394framerates_t frameRates;
-      err = dc1394_video_get_supported_framerates( m_camera, videoMode, &frameRates );
-      ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying supported frame "
-                  "rates: " << dc1394_error_get_string( err ) );
-      err = dc1394_video_set_framerate( m_camera,
-                                        frameRates.framerates[ frameRates.num - 1 ] );
-      ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
-                  << dc1394_error_get_string( err ) );
+      if ( forceFrameRate ) {
+        err = dc1394_video_set_framerate( m_camera, frameRate );
+        ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
+                    << dc1394_error_get_string( err ) );
+      } else {
+        dc1394framerates_t frameRates;
+        err = dc1394_video_get_supported_framerates( m_camera, videoMode, &frameRates );
+        ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error querying supported frame "
+                    "rates: " << dc1394_error_get_string( err ) );
+        err = dc1394_video_set_framerate( m_camera,
+                                          frameRates.framerates[ frameRates.num - 1 ] );
+        ERRORMACRO( err == DC1394_SUCCESS, Error, , "Error setting framerate: "
+                    << dc1394_error_get_string( err ) );
+      };
     };
     err = dc1394_capture_setup( m_camera, 4, DC1394_CAPTURE_FLAGS_DEFAULT );
     ERRORMACRO( err == DC1394_SUCCESS, Error, , "Could not setup camera (video mode "
