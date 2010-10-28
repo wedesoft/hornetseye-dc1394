@@ -53,14 +53,12 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, unsigned int node, dc1394speed_t spe
     dc1394video_modes_t videoModes;
     err = dc1394_video_get_supported_modes( m_camera, &videoModes );
     for ( unsigned int i=0; i<videoModes.num; i++ ) {
-      if ( !dc1394_is_video_mode_scalable( videoModes.modes[i] ) ) {
-        dc1394video_mode_t videoMode = videoModes.modes[i];
-        dc1394color_coding_t coding;
-        dc1394_get_color_coding_from_video_mode( m_camera, videoMode, &coding );
-        unsigned int width, height;
-        dc1394_get_image_size_from_video_mode( m_camera, videoMode, &width, &height );
-        select->add( coding, width, height );
-      };
+      dc1394video_mode_t videoMode = videoModes.modes[i];
+      dc1394color_coding_t coding;
+      dc1394_get_color_coding_from_video_mode( m_camera, videoMode, &coding );
+      unsigned int width, height;
+      dc1394_get_image_size_from_video_mode( m_camera, videoMode, &width, &height );
+      select->add( coding, width, height );
     };
     unsigned int selection = select->make();
     ERRORMACRO( selection < videoModes.num, Error, ,
