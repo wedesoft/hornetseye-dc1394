@@ -37,7 +37,7 @@ static VALUE yield( VALUE arg )
   return rb_yield( arg );
 }
 
-int DC1394Select::make(void) throw (Error)
+unsigned int DC1394Select::make(void) throw (Error)
 {
   int error;
   VALUE rbRetVal = rb_protect( yield, m_rbArray, &error );
@@ -48,7 +48,7 @@ int DC1394Select::make(void) throw (Error)
   };
   ERRORMACRO( TYPE( rbRetVal ) == T_FIXNUM, Error, , "Block must return a value of "
               "type 'Fixnum'" );
-  return NUM2INT(rbRetVal);
+  return NUM2UINT(rbRetVal);
 }
 
 VALUE DC1394Select::wrapRescue( VALUE rbValue )

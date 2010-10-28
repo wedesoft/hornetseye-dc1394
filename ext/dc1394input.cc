@@ -25,7 +25,7 @@ using namespace std;
 
 VALUE DC1394Input::cRubyClass = Qnil;
 
-DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
+DC1394Input::DC1394Input( DC1394Ptr dc1394, unsigned int node, dc1394speed_t speed,
                           DC1394SelectPtr select, bool forceFrameRate,
                           dc1394framerate_t frameRate )
   throw (Error):
@@ -42,7 +42,7 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
                 "'ieee1394','raw1394' and 'ohci1394' are loaded and whether you "
                 "have read/write permission on \"/dev/raw1394\". Also make sure "
                 "that the camera is connected and powered up." );
-    ERRORMACRO( node >= 0 && node < list->num, Error, ,
+    ERRORMACRO( node < list->num, Error, ,
                 "Camera node number " << node << " out of range. The range is "
                 "[ 0; " << list->num << " )" );
     m_camera = dc1394_camera_new( dc1394->get(), list->ids[ node ].guid );
@@ -52,7 +52,7 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
                << setbase( 10 ) << ")" );
     dc1394video_modes_t videoModes;
     err = dc1394_video_get_supported_modes( m_camera, &videoModes );
-    for ( int i=0; i<videoModes.num; i++ ) {
+    for ( unsigned int i=0; i<videoModes.num; i++ ) {
       if ( !dc1394_is_video_mode_scalable( videoModes.modes[i] ) ) {
         dc1394video_mode_t videoMode = videoModes.modes[i];
         dc1394color_coding_t coding;
@@ -64,8 +64,8 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
         ERRORMACRO( false, Error, , "Scalable video modes not implemented yet" );
       };
     };
-    int selection = select->make();
-    ERRORMACRO( selection >= 0 && selection < videoModes.num, Error, ,
+    unsigned int selection = select->make();
+    ERRORMACRO( selection < videoModes.num, Error, ,
                 "Index of selected video mode out of range" );
     dc1394video_mode_t videoMode = videoModes.modes[ selection ];
     err = dc1394_video_set_iso_speed( m_camera, speed );
@@ -419,7 +419,7 @@ VALUE DC1394Input::wrapNew( VALUE rbClass, VALUE rbDC1394, VALUE rbNode,
   try {
     DC1394Ptr *dc1394; Data_Get_Struct( rbDC1394, DC1394Ptr, dc1394 );
     DC1394SelectPtr select( new DC1394Select );
-    DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2INT( rbNode ),
+    DC1394InputPtr ptr( new DC1394Input( *dc1394, NUM2UINT( rbNode ),
                                          (dc1394speed_t)NUM2INT( rbSpeed ),
                                          select, rbForceFrameRate != Qfalse,
                                          (dc1394framerate_t)NUM2INT( rbFrameRate ) ) );
@@ -556,7 +556,7 @@ VALUE DC1394Input::wrapFeatureModes( VALUE rbSelf, VALUE rbFeature )
     dc1394feature_modes_t retVal = (*self)->
       featureModes( (dc1394feature_t)NUM2INT( rbFeature ) );
     rbRetVal = rb_ary_new();
-    for ( int i=0; i<retVal.num; i++ )
+    for ( unsigned int i=0; i<retVal.num; i++ )
       rb_ary_push( rbRetVal, INT2NUM( retVal.modes[i] ) );
   } catch ( std::exception &e ) {
     rb_raise( rb_eRuntimeError, "%s", e.what() );

@@ -25,7 +25,7 @@
 class DC1394Input
 {
 public:
-  DC1394Input( DC1394Ptr dc1394, int node, dc1394speed_t speed,
+  DC1394Input( DC1394Ptr dc1394, unsigned int node, dc1394speed_t speed,
                DC1394SelectPtr select, bool forceFrameRate,
                dc1394framerate_t frameRate ) throw (Error);
   virtual ~DC1394Input(void);
