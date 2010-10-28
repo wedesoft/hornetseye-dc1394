@@ -60,8 +60,6 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, unsigned int node, dc1394speed_t spe
         unsigned int width, height;
         dc1394_get_image_size_from_video_mode( m_camera, videoMode, &width, &height );
         select->add( coding, width, height );
-      } else {
-        ERRORMACRO( false, Error, , "Scalable video modes not implemented yet" );
       };
     };
     unsigned int selection = select->make();
