@@ -26,11 +26,13 @@ public:
   DC1394(void) throw (Error);
   virtual ~DC1394(void);
   std::string inspect(void) const;
-  dc1394_t *get(void) { return m_dc1394; }
+  void close(void);
+  dc1394_t *get(void) throw (Error);
   static VALUE cRubyClass;
   static VALUE registerRubyClass( VALUE module );
   static void deleteRubyObject( void *ptr );
   static VALUE wrapNew( VALUE rbClass );
+  static VALUE wrapClose( VALUE rbSelf );
 protected:
   dc1394_t *m_dc1394;
 };

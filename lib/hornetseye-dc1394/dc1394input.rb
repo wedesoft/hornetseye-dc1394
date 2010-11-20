@@ -26,26 +26,32 @@ module Hornetseye
       alias_method :orig_new, :new
 
       def new( node = 0, speed = SPEED_400, frame_rate = nil, &action )
-        @@dc1394 = DC1394.new unless @@dc1394
-        orig_new @@dc1394, node, speed, frame_rate != nil,
-                 frame_rate || FRAMERATE_240 do |modes|
-          map = { MONO8  => UBYTE,
-                  YUV422 => UYVY,
-                  RGB8   => UBYTERGB,
-                  MONO16 => USINT }
-          frame_types, index = [], []
-          modes.each_with_index do |mode,i|
-            target = map[ mode.first ]
-            if target
-              frame_types.push Hornetseye::Frame( target, *mode[ 1 .. 2 ] )
-              index.push i
+        dc1394 = @@dc1394 || DC1394.new
+        begin
+          retval = orig_new dc1394, node, speed, frame_rate != nil,
+                   frame_rate || FRAMERATE_240 do |modes|
+            map = { MODE_MONO8  => UBYTE,
+                    MODE_YUV422 => UYVY,
+                    MODE_RGB8   => UBYTERGB,
+                    MODE_MONO16 => USINT }
+            frame_types, index = [], []
+            modes.each_with_index do |mode,i|
+              target = map[ mode.first ]
+              if target
+                frame_types.push Hornetseye::Frame( target, *mode[ 1 .. 2 ] )
+                index.push i
+              end
             end
+            desired = action.call frame_types
+            unless frame_types.member? desired
+              raise "Frame type #{desired} not supported by camera" 
+            end
+            index[ frame_types.index( desired ) ]
           end
-          desired = action.call frame_types
-          unless frame_types.member? desired
-            raise "Frame type #{desired} not supported by camera" 
-          end
-          index[ frame_types.index( desired ) ]
+          @@dc1394 = dc1394
+          retval
+        ensure
+          dc1394.close unless @@dc1394
         end
       end
 

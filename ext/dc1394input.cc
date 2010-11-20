@@ -304,17 +304,28 @@ VALUE DC1394Input::registerRubyClass( VALUE module )
   rb_define_const( cRubyClass,  "SPEED_800",  INT2NUM(  DC1394_ISO_SPEED_800 ) );
   rb_define_const( cRubyClass,  "SPEED_1600", INT2NUM( DC1394_ISO_SPEED_1600 ) );
   rb_define_const( cRubyClass,  "SPEED_3200", INT2NUM( DC1394_ISO_SPEED_3200 ) );
-  rb_define_const( cRubyClass,   "MONO8", INT2NUM(   DC1394_COLOR_CODING_MONO8 ) );
-  rb_define_const( cRubyClass,  "YUV411", INT2NUM(  DC1394_COLOR_CODING_YUV411 ) );
-  rb_define_const( cRubyClass,  "YUV422", INT2NUM(  DC1394_COLOR_CODING_YUV422 ) );
-  rb_define_const( cRubyClass,  "YUV444", INT2NUM(  DC1394_COLOR_CODING_YUV444 ) );
-  rb_define_const( cRubyClass,    "RGB8", INT2NUM(    DC1394_COLOR_CODING_RGB8 ) );
-  rb_define_const( cRubyClass,  "MONO16", INT2NUM(  DC1394_COLOR_CODING_MONO16 ) );
-  rb_define_const( cRubyClass,   "RGB16", INT2NUM(   DC1394_COLOR_CODING_RGB16 ) );
-  rb_define_const( cRubyClass, "MONO16S", INT2NUM( DC1394_COLOR_CODING_MONO16S ) );
-  rb_define_const( cRubyClass,  "RGB16S", INT2NUM(  DC1394_COLOR_CODING_RGB16S ) );
-  rb_define_const( cRubyClass,    "RAW8", INT2NUM(    DC1394_COLOR_CODING_RAW8 ) );
-  rb_define_const( cRubyClass,   "RAW16", INT2NUM(   DC1394_COLOR_CODING_RAW16 ) );
+  rb_define_const( cRubyClass,   "MODE_MONO8", 
+                   INT2NUM(   DC1394_COLOR_CODING_MONO8 ) );
+  rb_define_const( cRubyClass,  "MODE_YUV411", 
+                   INT2NUM(  DC1394_COLOR_CODING_YUV411 ) );
+  rb_define_const( cRubyClass,  "MODE_YUV422", 
+                   INT2NUM(  DC1394_COLOR_CODING_YUV422 ) );
+  rb_define_const( cRubyClass,  "MODE_YUV444", 
+                   INT2NUM(  DC1394_COLOR_CODING_YUV444 ) );
+  rb_define_const( cRubyClass,    "MODE_RGB8", 
+                   INT2NUM(    DC1394_COLOR_CODING_RGB8 ) );
+  rb_define_const( cRubyClass,  "MODE_MONO16", 
+                   INT2NUM(  DC1394_COLOR_CODING_MONO16 ) );
+  rb_define_const( cRubyClass,   "MODE_RGB16", 
+                   INT2NUM(   DC1394_COLOR_CODING_RGB16 ) );
+  rb_define_const( cRubyClass, "MODE_MONO16S", 
+                   INT2NUM( DC1394_COLOR_CODING_MONO16S ) );
+  rb_define_const( cRubyClass,  "MODE_RGB16S", 
+                   INT2NUM(  DC1394_COLOR_CODING_RGB16S ) );
+  rb_define_const( cRubyClass,    "MODE_RAW8", 
+                   INT2NUM(    DC1394_COLOR_CODING_RAW8 ) );
+  rb_define_const( cRubyClass,   "MODE_RAW16", 
+                   INT2NUM(   DC1394_COLOR_CODING_RAW16 ) );
   rb_define_const( cRubyClass, "FRAMERATE_1_875", INT2NUM( DC1394_FRAMERATE_1_875 ) );
   rb_define_const( cRubyClass, "FRAMERATE_3_75" , INT2NUM( DC1394_FRAMERATE_3_75  ) );
   rb_define_const( cRubyClass, "FRAMERATE_7_5"  , INT2NUM( DC1394_FRAMERATE_7_5   ) );

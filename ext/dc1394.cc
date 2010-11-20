@@ -34,7 +34,22 @@ DC1394::DC1394(void) throw (Error):
 
 DC1394::~DC1394(void)
 {
-  dc1394_free( m_dc1394 );
+  close();
+}
+
+void DC1394::close(void)
+{
+  if ( m_dc1394 != NULL ) {
+    dc1394_free( m_dc1394 );
+    m_dc1394 = NULL;
+  };
+}
+
+dc1394_t *DC1394::get(void) throw (Error)
+{
+  ERRORMACRO( m_dc1394 != NULL, Error, , "DC1394 device is closed. Did you call "
+              "\"close\" before?" );
+  return m_dc1394;
 }
 
 string DC1394::inspect(void) const
@@ -49,6 +64,7 @@ VALUE DC1394::registerRubyClass( VALUE module )
   cRubyClass = rb_define_class_under( module, "DC1394", rb_cObject );
   rb_define_singleton_method( cRubyClass, "new",
                               RUBY_METHOD_FUNC( wrapNew ), 0 );
+  rb_define_method( cRubyClass, "close", RUBY_METHOD_FUNC( wrapClose ), 0 );
   return cRubyClass;
 }
 
@@ -68,5 +84,12 @@ VALUE DC1394::wrapNew( VALUE rbClass )
     rb_raise( rb_eRuntimeError, "%s", e.what() );
   };
   return retVal;
+}
+
+VALUE DC1394::wrapClose( VALUE rbSelf )
+{
+  DC1394Ptr *self; Data_Get_Struct( rbSelf, DC1394Ptr, self );
+  (*self)->close();
+  return rbSelf;
 }
 
