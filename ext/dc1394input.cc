@@ -72,15 +72,20 @@ DC1394Input::DC1394Input( DC1394Ptr dc1394, unsigned int node, dc1394speed_t spe
                 << dc1394_error_get_string( err ) );
     dc1394color_coding_t coding;
     dc1394_get_color_coding_from_video_mode( m_camera, videoMode, &coding );
-    if ( coding == DC1394_COLOR_CODING_MONO8 )
+    switch ( coding ) {
+    case DC1394_COLOR_CODING_MONO8:
       m_typecode = "UBYTE";
-    else if ( coding == DC1394_COLOR_CODING_YUV422 )
+      break;
+    case DC1394_COLOR_CODING_YUV422:
       m_typecode = "UYVY";
-    else if ( coding == DC1394_COLOR_CODING_RGB8 )
+      break;
+    case DC1394_COLOR_CODING_RGB8:
       m_typecode = "UBYTERGB";
-    else if ( coding == DC1394_COLOR_CODING_MONO16 )
+      break;
+    case DC1394_COLOR_CODING_MONO16:
       m_typecode = "USINT";
-    else {
+      break;
+    default:
       ERRORMACRO( false, Error, , "Conversion for DC1394 colorspace " << coding
                   << " not implemented yet" );
     };
