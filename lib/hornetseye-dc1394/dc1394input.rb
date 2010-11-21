@@ -42,7 +42,14 @@ module Hornetseye
                 index.push i
               end
             end
-            desired = action.call frame_types
+            if action
+              desired = action.call frame_types
+            else
+              preference = [ UYVY, UBYTERGB, USINT, UBYTE ]
+              desired = frame_types.sort_by do |mode|
+                [ -preference.index( mode.typecode ), mode.width * mode.height ]
+              end.last
+            end
             unless frame_types.member? desired
               raise "Frame type #{desired.inspect} not supported by camera" 
             end
