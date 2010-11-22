@@ -26,72 +26,312 @@ module Hornetseye
 
     class << self
 
-      # Close the video device
+      # Firewire bus speed
+      SPEED_100 = nil
+
+      # Firewire bus speed
+      SPEED_200 = nil
+
+      # Firewire bus speed
+      SPEED_400 = nil
+
+      # Firewire bus speed
+      SPEED_800 = nil
+
+      # Firewire bus speed
+      SPEED_1600 = nil
+
+      # Firewire bus speed
+      SPEED_3200 = nil
+
+      # Video mode
       #
-      # @return [DC1394Input] Returns +self+.
-      def close
-      end
+      # @private
+      MODE_MONO8 = nil
 
-      # Read a video frame
+      # Video mode
       #
-      # @return [MultiArray,Frame_] The video frame.
-      def read
-      end
+      # @private
+      MODE_YUV411 = nil
 
-      # Check whether device is not closed
+      # Video mode
       #
-      # @return [Boolean] Returns +true+ as long as device is open.
-      def status?
-      end
+      # @private
+      MODE_YUV422 = nil
 
-      # Width of video input
+      # Video mode
       #
-      # @return [Integer] Width of video frames.
-      def width
-      end
+      # @private
+      MODE_YUV444 = nil
 
-      # Height of video input
+      # Video mode
       #
-      # @return [Integer] Width of video frames.
-      def height
-      end
+      # @private
+      MODE_RGB8 = nil
 
-      def feature_read( id )
-      end
+      # Video mode
+      #
+      # @private
+      MODE_MONO16 = nil
 
-      def feature_write( id, value )
-      end
+      # Video mode
+      #
+      # @private
+      MODE_RGB16 = nil
 
-      def feature_exist?( id )
-      end
+      # Video mode
+      #
+      # @private
+      MODE_MONO16S = nil
 
-      def feature_readable?( id )
-      end
+      # Video mode
+      #
+      # @private
+      MODE_RGB16S = nil
 
-      def feature_switchable?( id )
-      end
+      # Video mode
+      #
+      # @private
+      MODE_RAW8 = nil
 
-      def feature_on?( id )
-      end
+      # Video mode
+      #
+      # @private
+      MODE_RAW16 = nil
 
-      def feature_on( id, value )
-      end
+      # Frame rate
+      FRAMERATE_1_875 = nil
 
-      def feature_modes( id )
-      end
+      # Frame rate
+      FRAMERATE_3_75 = nil
 
-      def feature_mode_read( id )
-      end
+      # Frame rate
+      FRAMERATE_7_5 = nil
 
-      def feature_mode_write( id, mode )
-      end
+      # Frame rate
+      FRAMERATE_15 = nil
 
-      def feature_min( id )
-      end
+      # Frame rate
+      FRAMERATE_30 = nil
 
-      def feature_max( id )
-      end
+      # Frame rate
+      FRAMERATE_60 = nil
 
+      # Frame rate
+      FRAMERATE_120 = nil
+
+      # Frame rate
+      FRAMERATE_240 = nil
+
+      # First feature
+      FEATURE_MIN = nil
+
+      # A feature
+      FEATURE_BRIGHTNESS = nil
+
+      # A feature
+      FEATURE_EXPOSURE = nil
+
+      # A feature
+      FEATURE_SHARPNESS = nil
+
+      # A feature
+      FEATURE_WHITE_BALANCE = nil
+
+      # A feature
+      FEATURE_HUE = nil
+
+      # A feature
+      FEATURE_SATURATION = nil
+
+      # A feature
+      FEATURE_GAMMA = nil
+
+      # A feature
+      FEATURE_SHUTTER = nil
+
+      # A feature
+      FEATURE_GAIN = nil
+
+      # A feature
+      FEATURE_IRIS = nil
+
+      # A feature
+      FEATURE_FOCUS = nil
+
+      # A feature
+      FEATURE_TEMPERATURE = nil
+
+      # A feature
+      FEATURE_TRIGGER = nil
+
+      # A feature
+      FEATURE_TRIGGER_DELAY = nil
+
+      # A feature
+      FEATURE_WHITE_SHADING = nil
+
+      # A feature
+      FEATURE_FRAME_RATE = nil
+
+      # A feature
+      FEATURE_ZOOM = nil
+
+      # A feature
+      FEATURE_PAN = nil
+
+      # A feature
+      FEATURE_TILT = nil
+
+      # A feature
+      FEATURE_OPTICAL_FILTER = nil
+
+      # A feature
+      FEATURE_CAPTURE_SIZE = nil
+
+      # A feature
+      FEATURE_CAPTURE_QUALITY = nil
+
+      # Last feature
+      FEATURE_MAX = nil
+
+      # Feature mode
+      FEATURE_MODE_MANUAL = nil
+
+      # Feature mode
+      FEATURE_MODE_AUTO = nil
+
+      # Feature mode
+      FEATURE_MODE_ONE_PUSH_AUTO = nil
+
+    end
+
+    # Close the video device
+    #
+    # @return [DC1394Input] Returns +self+.
+    def close
+    end
+
+    # Read a video frame
+    #
+    # @return [MultiArray,Frame_] The video frame.
+    def read
+    end
+
+    # Check whether device is not closed
+    #
+    # @return [Boolean] Returns +true+ as long as device is open.
+    def status?
+    end
+
+    # Width of video input
+    #
+    # @return [Integer] Width of video frames.
+    def width
+    end
+
+    # Height of video input
+    #
+    # @return [Integer] Width of video frames.
+    def height
+    end
+
+    # Get value of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Integer] Current value of feature.
+    def feature_read( id )
+    end
+
+    # Set value of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Integer] Returns +value+.
+    def feature_write( id, value )
+    end
+
+    # Check for existence of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Boolean] Returns +true+ if this feature is supported.
+    def feature_exist?( id )
+    end
+
+    # Check whether feature can be read
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Boolean] Returns +true+ if this feature can be read.
+    def feature_readable?( id )
+    end
+
+    # Check whether feature can be switched on and off
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Boolean] Returns +true+ if this feature can be switched on and off.
+    def feature_switchable?( id )
+    end
+
+    # Check whether feature is switched on
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Boolean] Returns +true+ if this feature is switched on.
+    def feature_on?( id )
+    end
+
+    # Switch feature on or off
+    #
+    # @param [Integer] id Feature identifier.
+    # @param [Boolean] value +true+ for on and +false+ for off.
+    #
+    # @return [Boolean] Returns +value+.
+    def feature_on( id, value )
+    end
+
+    # Get supported modes of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Array<Integer>] Returns array with supported modes.
+    def feature_modes( id )
+    end
+
+    # Get current mode of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Integer] Returns the current mode.
+    def feature_mode_read( id )
+    end
+
+    # Set mode of feature
+    #
+    # @param [Integer] id Feature identifier.
+    # @param [Integer] mode Mode of feature.
+    #
+    # @return [Integer] Returns +mode+.
+    def feature_mode_write( id, mode )
+    end
+
+    # Get minimum value of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Integer] Minimum value of feature.
+    def feature_min( id )
+    end
+
+    # Get maximum value of feature
+    #
+    # @param [Integer] id Feature identifier.
+    #
+    # @return [Integer] Maximum value of feature.
+    def feature_max( id )
     end
 
   end
