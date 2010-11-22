@@ -9,7 +9,7 @@ This Ruby extension provides camera input for DC1394 compatible firewire cameras
 Synopsis
 --------
 
-This Ruby extension provides the class {Hornetseye::DC1394} for capturing video frames using a DC1394-compatible firewire camera.
+This Ruby extension provides the class {Hornetseye::DC1394Input} for capturing video frames using a DC1394-compatible firewire camera.
 
 Installation
 ------------
