@@ -56,6 +56,42 @@ module Hornetseye
       def height
       end
 
+      def feature_read( id )
+      end
+
+      def feature_write( id, value )
+      end
+
+      def feature_exist?( id )
+      end
+
+      def feature_readable?( id )
+      end
+
+      def feature_switchable?( id )
+      end
+
+      def feature_on?( id )
+      end
+
+      def feature_on( id, value )
+      end
+
+      def feature_modes( id )
+      end
+
+      def feature_mode_read( id )
+      end
+
+      def feature_mode_write( id, mode )
+      end
+
+      def feature_min( id )
+      end
+
+      def feature_max( id )
+      end
+
     end
 
   end
