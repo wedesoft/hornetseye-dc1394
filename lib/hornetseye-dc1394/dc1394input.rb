@@ -1,4 +1,4 @@
-# hornetseye-xorg - Graphical output under X.Org
+# hornetseye-dc1394 - Capture from DC1394 compatible firewire camera
 # Copyright (C) 2010 Jan Wedekind
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,33 @@
 # Namespace of Hornetseye computer vision library
 module Hornetseye
 
+  # Class for handling a DC1394-compatible firewire camera
+  #
+  # This Ruby-extension is based on libdc1394.
+  #
+  # @see http://damien.douxchamps.net/ieee1394/libdc1394/
   class DC1394Input
 
     class << self
 
+      # DC1394 handle
+      #
+      # @private
       @@dc1394 = nil
 
+      # Alias for overriding native method
+      #
+      # @private
       alias_method :orig_new, :new
 
+      # Open the firewire camera
+      #
+      # @param [Integer] node Camera node to open.
+      # @param [Integer] speed Firewire bus speed.
+      # @param [Integer,NilClass] frame_rate Desired frame rate.
+      # @param [Proc] action Optional block for selecting the desired video mode.
+      #
+      # return [DC1394Input] An object for accessing the firewire camera.
       def new( node = 0, speed = SPEED_400, frame_rate = nil, &action )
         dc1394 = @@dc1394 || DC1394.new
         begin

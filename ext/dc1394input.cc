@@ -395,6 +395,8 @@ VALUE DC1394Input::registerRubyClass( VALUE module )
                    INT2NUM( DC1394_FEATURE_MODE_ONE_PUSH_AUTO ) );
   rb_define_singleton_method( cRubyClass, "new", RUBY_METHOD_FUNC( wrapNew ), 5 );
   rb_define_method( cRubyClass, "close", RUBY_METHOD_FUNC( wrapClose ), 0 );
+  rb_define_method( cRubyClass, "width", RUBY_METHOD_FUNC( wrapWidth ), 0 );
+  rb_define_method( cRubyClass, "height", RUBY_METHOD_FUNC( wrapHeight ), 0 );
   rb_define_method( cRubyClass, "read", RUBY_METHOD_FUNC( wrapRead ), 0 );
   rb_define_method( cRubyClass, "status?", RUBY_METHOD_FUNC( wrapStatus ), 0 );
   rb_define_method( cRubyClass, "feature_read",
@@ -472,6 +474,18 @@ VALUE DC1394Input::wrapStatus( VALUE rbSelf )
 {
   DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
   return (*self)->status() ? Qtrue : Qfalse;
+}
+
+VALUE DC1394Input::wrapWidth( VALUE rbSelf )
+{
+  DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+  return INT2NUM((*self)->width());
+}
+
+VALUE DC1394Input::wrapHeight( VALUE rbSelf )
+{
+  DC1394InputPtr *self; Data_Get_Struct( rbSelf, DC1394InputPtr, self );
+  return INT2NUM((*self)->height());
 }
 
 VALUE DC1394Input::wrapFeatureGetValue( VALUE rbSelf, VALUE rbFeature )

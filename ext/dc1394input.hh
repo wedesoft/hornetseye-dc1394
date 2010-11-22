@@ -33,6 +33,8 @@ public:
   FramePtr read(void) throw (Error);
   bool status(void) const;
   std::string inspect(void) const;
+  int width(void) const { return m_width; }
+  int height(void) const { return m_height; }
   unsigned int featureGetValue( dc1394feature_t feature ) throw (Error);
   void featureSetValue( dc1394feature_t feature, unsigned int value ) throw (Error);
   bool featureIsPresent( dc1394feature_t feature ) throw (Error);
@@ -54,6 +56,8 @@ public:
   static VALUE wrapClose( VALUE rbSelf );
   static VALUE wrapRead( VALUE rbSelf );
   static VALUE wrapStatus( VALUE rbSelf );
+  static VALUE wrapWidth( VALUE rbSelf );
+  static VALUE wrapHeight( VALUE rbSelf );
   static VALUE wrapFeatureGetValue( VALUE rbSelf, VALUE rbFeature );
   static VALUE wrapFeatureSetValue( VALUE rbSelf, VALUE rbFeature, VALUE rbValue );
   static VALUE wrapFeatureIsPresent( VALUE rbSelf, VALUE rbFeature );
