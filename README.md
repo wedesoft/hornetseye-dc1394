@@ -13,7 +13,7 @@ This Ruby extension provides the class {Hornetseye::DC1394Input} for capturing v
 
 Installation
 ------------
-*hornetseye-dc1394* requires the V4L2 headers. If you are running Debian or (K)ubuntu, you can install them like this:
+*hornetseye-dc1394* requires the DC1394 headers. If you are running Debian or (K)ubuntu, you can install them like this:
 
     $ sudo aptitude install libdc1394-22-dev
 
