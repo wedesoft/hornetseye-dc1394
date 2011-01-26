@@ -83,6 +83,8 @@ module Hornetseye
 
     end
 
+    include ReaderConversion
+
   end
 
 end
