@@ -31,7 +31,7 @@ extern "C" {
 
   void Init_hornetseye_dc1394(void)
   {
-    rb_require( "hornetseye_frame" );
+    rb_eval_string( "require 'hornetseye_frame'" );
     VALUE rbHornetseye = rb_define_module( "Hornetseye" );
     DC1394::registerRubyClass( rbHornetseye );
     DC1394Input::registerRubyClass( rbHornetseye );

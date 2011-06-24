@@ -54,10 +54,10 @@ module Hornetseye
                     MODE_RGB8   => UBYTERGB,
                     MODE_MONO16 => USINT }
             frame_types, index = [], []
-            modes.each_with_index do |mode,i|
-              target = map[ mode.first ]
-              if target
-                frame_types.push Hornetseye::Frame( target, *mode[ 1 .. 2 ] )
+            modes.collect { |mode| [map[mode.first], *mode[1 .. 2]] }.
+              each_with_index do |mode,i|
+              if mode.first
+                frame_types.push mode
                 index.push i
               end
             end
@@ -66,13 +66,13 @@ module Hornetseye
             else
               preference = [ UBYTERGB, UYVY, USINT, UBYTE ]
               desired = frame_types.sort_by do |mode|
-                [ -preference.index( mode.typecode ), mode.width * mode.height ]
+                [-preference.index( mode.typecode ), mode[1] * mode[2]]
               end.last
             end
             unless frame_types.member? desired
               raise "Frame type #{desired.inspect} not supported by camera" 
             end
-            index[ frame_types.index( desired ) ]
+            index[frame_types.index(desired)]
           end
           @@dc1394 = dc1394
           retval
