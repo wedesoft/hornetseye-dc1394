@@ -66,7 +66,7 @@ module Hornetseye
             else
               preference = [ UBYTERGB, UYVY, USINT, UBYTE ]
               desired = frame_types.sort_by do |mode|
-                [-preference.index( mode.typecode ), mode[1] * mode[2]]
+                [-preference.index(mode.first), mode[1] * mode[2]]
               end.last
             end
             unless frame_types.member? desired
