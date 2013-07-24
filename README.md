@@ -15,7 +15,7 @@ Installation
 ------------
 *hornetseye-dc1394* requires the DC1394 headers. If you are running Debian or (K)ubuntu, you can install them like this:
 
-    $ sudo aptitude install libdc1394-22-dev
+    $ sudo aptitude install libdc1394-22-dev libswscale-dev libboost-dev
 
 To install this Ruby extension, use the following command:
 
