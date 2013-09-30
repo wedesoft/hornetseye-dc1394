@@ -7,7 +7,7 @@ require 'rake/loaders/makefile'
 require 'rbconfig'
 
 PKG_NAME = 'hornetseye-dc1394'
-PKG_VERSION = '0.5.3'
+PKG_VERSION = '0.5.4'
 CFG = RbConfig::CONFIG
 CXX = ENV[ 'CXX' ] || 'g++'
 RB_FILES = FileList[ 'lib/**/*.rb' ]
@@ -22,6 +22,7 @@ BIN_FILES = [ 'README.md', 'COPYING', '.document', SO_FILE ] +
             RB_FILES + TS_FILES + TC_FILES
 SUMMARY = %q{Capture from DC1394 compatible firewire camera}
 DESCRIPTION = %q{This Ruby extension provides camera input for DC1394 compatible firewire cameras using libdc1394 2.x.}
+LICENSE = 'GPL-3+'
 AUTHOR = %q{Jan Wedekind}
 EMAIL = %q{jan@wedesoft.de}
 HOMEPAGE = %q{http://wedesoft.github.com/hornetseye-dc1394/}
@@ -102,6 +103,7 @@ begin
     s.date = Date.today.to_s
     s.summary = SUMMARY
     s.description = DESCRIPTION
+    s.license = LICENSE
     s.author = AUTHOR
     s.email = EMAIL
     s.homepage = HOMEPAGE
@@ -126,6 +128,7 @@ begin
     s.date = Date.today.to_s
     s.summary = SUMMARY
     s.description = DESCRIPTION
+    s.license = LICENSE
     s.author = AUTHOR
     s.email = EMAIL
     s.homepage = HOMEPAGE
