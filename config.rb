@@ -1,7 +1,7 @@
 require 'rake'
 
 PKG_NAME = 'hornetseye-dc1394'
-PKG_VERSION = '0.5.5'
+PKG_VERSION = '0.5.6'
 CFG = RbConfig::CONFIG
 CXX = ENV[ 'CXX' ] || 'g++'
 RB_FILES = ['config.rb'] + FileList[ 'lib/**/*.rb' ]
